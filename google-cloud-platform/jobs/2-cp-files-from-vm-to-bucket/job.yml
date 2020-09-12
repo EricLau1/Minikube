@@ -1,0 +1,30 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: uploads
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+
+          volumes:
+          - name: uploads-volume
+            secret:
+              secretName: upload-keys
+              defaultMode: 0400
+
+          containers:
+          - name: uploads
+            image: uploads:1.0
+            args:
+            - /bin/sh
+            - -c
+            - scp -o StrictHostKeyChecking=no -i /keys/pvtkey vagrant@192.168.50.11:/home/vagrant/*.pdf /Uploads && cd /Uploads && ls -la && /root/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file=/keys/credentials && /root/google-cloud-sdk/bin/gsutil cp *.pdf gs://my-bucket-2020/
+            
+            volumeMounts:
+            - name: uploads-volume
+              readOnly: true
+              mountPath: /keys

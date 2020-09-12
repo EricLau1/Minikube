@@ -1,0 +1,18 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: uploads
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: uploads
+            image: uploads:1.0
+            args:
+            - /bin/sh
+            - -c
+            - scp -o StrictHostKeyChecking=no -i /keys/exemplo vagrant@192.168.50.11:/home/vagrant/*.pdf /Uploads && cd /Uploads && ls -la && /root/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file=/keys/credentials.json && /root/google-cloud-sdk/bin/gsutil cp *.pdf gs://my-bucket-2020/
+          restartPolicy: OnFailure
