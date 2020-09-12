@@ -1,0 +1,1 @@
+https://www.openshift.com/blog/kubernetes-replicas-appreciated-workhorses
